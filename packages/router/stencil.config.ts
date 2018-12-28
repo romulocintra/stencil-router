@@ -1,4 +1,6 @@
-exports.config = {
+import { Config } from '@stencil/core';
+
+export const config: Config = {
   namespace: 'stencilrouter',
   outputTargets:[
     {
@@ -6,8 +8,3 @@ exports.config = {
     }
   ]
 };
-
-exports.devServer = {
-  root: 'www',
-  watchGlob: '**/**'
-}

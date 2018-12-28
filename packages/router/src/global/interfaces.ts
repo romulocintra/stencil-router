@@ -3,9 +3,18 @@ export interface ActiveRouter {
   dispatch: (location: LocationSegments, nextListeners: RouteSubscription[]) => void;
 }
 
+export type Prompt = (location: LocationSegments, action: string) => string;
+
+export interface RouteRenderProps {
+  history: RouterHistory;
+  match: MatchResults | null;
+  [key: string]: any;
+}
+
 
 export interface RouteViewOptions {
-  scrollTopOffset?: number
+  scrollTopOffset?: number,
+  scrollToId?: string
 }
 
 export interface RouteSubscription {
@@ -19,13 +28,13 @@ export type HistoryType = 'browser' | 'hash';
 export type Listener = () => void;
 
 export interface LocationSegments {
-  pathname?: string;
+  pathname: string;
+  query: { [key: string]: any };
+  key: string;
+  scrollPosition?: [number, number];
   search?: string;
   hash?: string;
   state?: any;
-  key?: string;
-  query?: { [key: string]: any };
-  scrollPosition?: [number, number];
 }
 
 export type LocationSegmentPart = 'pathname' | 'search' | 'hash' | 'state' | 'key';
@@ -40,7 +49,7 @@ export interface RouterHistory {
   go: (n: number) => void;
   goBack: () => void;
   goForward: () => void;
-  block: (prompt?: string) => () => void;
+  block: (prompt?: string | Prompt) => () => void;
   listen: (listener: Function) => () => void;
 }
 

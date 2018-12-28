@@ -6,9 +6,9 @@ import { RouterHistory, LocationSegments, injectHistory } from '@stencil/router'
 })
 export class TestDeepComponent {
 
-  @Element() blue: HTMLStencilElement;
-  @Prop() history: RouterHistory;
-  @Prop() location: LocationSegments;
+  @Element() el!: HTMLStencilElement;
+  @Prop() history?: RouterHistory;
+  @Prop() location?: LocationSegments;
 
   componentDidUpdate() {
     console.log('deepchild DidUpdate');
@@ -22,10 +22,10 @@ export class TestDeepComponent {
           {JSON.stringify(this.history, null, 2)}
         </pre>
         <pre>
-          <b>this.history</b>:<br/>
+          <b>this.location</b>:<br/>
           {JSON.stringify(this.location, null, 2)}
         </pre>
-        <button onClick={() => this.history.push('/')}> Back Home</button>
+        <button onClick={() => this.history ? this.history.push('/') : null}> Back Home</button>
       </div>
     );
   }

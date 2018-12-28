@@ -1,10 +1,11 @@
 export { default as injectHistory } from './global/injectHistory';
-export * from './components';
 export {
   ActiveRouter,
   Listener,
   LocationSegments,
   RouterHistory,
   MatchOptions,
-  MatchResults
+  MatchResults,
+  RouteRenderProps
 } from './global/interfaces';
+export { Components } from './components';

@@ -1,7 +1,7 @@
 // Adapted from the https://github.com/ReactTraining/history and converted to TypeScript
 
-import { createLocation } from './location-utils';
-import { RouterHistory, LocationSegments } from '../global/interfaces';
+import { createLocation, createKey } from './location-utils';
+import { RouterHistory, LocationSegments, Prompt } from '../global/interfaces';
 import { invariant, warning } from './log';
 import {
   addLeadingSlash,
@@ -62,11 +62,9 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
   const needsHashChangeListener = !supportsPopStateOnHashChange();
   const scrollHistory = createScrollHistory();
 
-  const {
-    forceRefresh = false,
-    getUserConfirmation = getConfirmation,
-    keyLength = 6
-  } = props;
+  const forceRefresh = (props.forceRefresh != null) ? props.forceRefresh : false;
+  const getUserConfirmation = (props.getUserConfirmation != null) ? props.getUserConfirmation : getConfirmation;
+  const keyLength = (props.keyLength != null) ? props.keyLength : 6;
   const basename = props.basename ? stripTrailingSlash(addLeadingSlash(props.basename)) : '';
 
   const getDOMLocation = (historyState: LocationSegments) => {
@@ -86,12 +84,9 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
       path = stripBasename(path, basename);
     }
 
-    return createLocation(path, state, key);
+    return createLocation(path, state, key || createKey(keyLength));
   };
 
-  const createKey = () => (
-    Math.random().toString(36).substr(2, keyLength)
-  );
 
   const transitionManager = createTransitionManager();
 
@@ -188,7 +183,7 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
     );
 
     const action = 'PUSH';
-    const location = createLocation(path, state, createKey(), history.location);
+    const location = createLocation(path, state, createKey(keyLength), history.location);
 
     transitionManager.confirmTransitionTo(location, action, getUserConfirmation, (ok: boolean) => {
       if (!ok) {
@@ -199,7 +194,7 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
       const { key, state } = location;
 
       if (canUseHistory) {
-        globalHistory.pushState({ key, state }, null, href);
+        globalHistory.pushState({ key, state }, undefined, href);
 
         if (forceRefresh) {
           window.location.href = href;
@@ -231,7 +226,7 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
     );
 
     const action = 'REPLACE';
-    const location = createLocation(path, state, createKey(), history.location);
+    const location = createLocation(path, state, createKey(keyLength), history.location);
 
     transitionManager.confirmTransitionTo(location, action, getUserConfirmation, (ok: boolean) => {
       if (!ok) {
@@ -242,7 +237,7 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
       const { key, state } = location;
 
       if (canUseHistory) {
-        globalHistory.replaceState({ key, state }, null, href);
+        globalHistory.replaceState({ key, state }, undefined, href);
 
         if (forceRefresh) {
           window.location.replace(href);
@@ -295,7 +290,7 @@ const createBrowserHistory = (props: CreateBrowserHistoryOptions = {}): RouterHi
 
   let isBlocked = false;
 
-  const block = (prompt = '') => {
+  const block = (prompt: string | Prompt = '') => {
     const unblock = transitionManager.setPrompt(prompt);
 
     if (!isBlocked) {
